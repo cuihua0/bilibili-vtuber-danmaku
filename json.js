@@ -2,23 +2,23 @@ const fs = require('fs').promises
 const { join } = require('path')
 
 const rooms = async () => {
-  return (await fs.readdir(__dirname))
+  return (await fs.readdir(join(__dirname, 'danmaku')))
     .filter(roomid => !Number.isNaN(Number(roomid)))
 }
 
-const records = async roomid => (await fs.readdir(join(__dirname, String(roomid)))).map(date => date.replace('.txt', ''))
+const records = async roomid => (await fs.readdir(join(__dirname, 'danmaku', String(roomid)))).map(date => date.replace('.txt', ''))
 
 const roomsRecords = async () => {
   return Object.assign(...await Promise.all(
     (await rooms())
-    .map(async roomid => ({
-      [roomid]: await records(roomid)
-    }))
+      .map(async roomid => ({
+        [roomid]: await records(roomid)
+      }))
   ))
 }
 
 const read = async (roomid, date, getUname = false) => {
-  let raw = String(await fs.readFile(join(__dirname, `${roomid}/${date}.txt`)))
+  let raw = String(await fs.readFile(join(__dirname, 'danmaku', `${roomid}/${date}.txt`)))
   let info = raw.split('\n')
   let result = { danmaku: [], raw, speakers: {}, online: Array(1440).fill(1) }
   let currentMinutes = 0
