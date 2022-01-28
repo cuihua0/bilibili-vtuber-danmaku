@@ -7,15 +7,15 @@ let rooms = {}
 
 const checkFile = async (roomid) => {
   if (!rooms[roomid]) {
-    let folders = await fs.readdir('.')
+    let folders = await fs.readdir('danmaku')
     if (!folders.includes(String(roomid))) {
-      await fs.mkdir(String(roomid))
+      await fs.mkdir(`danmaku/${String(roomid)}`)
     }
     rooms[roomid] = { speakers: {}, currentFilename: undefined, lastTime: undefined }
   }
 
   let date = new Date()
-  let filename = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}.txt`
+  let filename = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}.txt`
   let time = `${date.getHours()}:${date.getMinutes()}`
   let timestamp = date.getTime()
 
@@ -31,7 +31,7 @@ const checkFile = async (roomid) => {
         .map(key => `${key}:${rooms[roomid].speakers[key].uname}:${rooms[roomid].speakers[key].count}`)
         .join(',')
       rooms[roomid].speakers = {}
-      await fs.appendFile(`${roomid}/${lastFIleName}`, `SPEAKERNUM${speakerNum};${allSpeaker}\nV2\n`)
+      await fs.appendFile(`danmaku/${roomid}/${lastFIleName}`, `SPEAKERNUM${speakerNum};${allSpeaker}\nV2\n`)
     }
   }
   return { timestamp, filename, time, lastTime: {} }
@@ -40,7 +40,7 @@ const checkFile = async (roomid) => {
 socket.on('online', async ({ roomid, online }) => {
   if (online > 1) {
     const { time, filename } = await checkFile(roomid)
-    await fs.appendFile(`${roomid}/${filename}`, `TIME${time}ONLINE${online}\n`)
+    await fs.appendFile(`danmaku/${roomid}/${filename}`, `TIME${time}ONLINE${online}\n`)
   }
 })
 
@@ -52,6 +52,6 @@ socket.on('danmaku', async ({ message, roomid, mid, uname }) => {
       rooms[roomid].speakers[mid] = { count: 0, uname }
     }
     rooms[roomid].speakers[mid].count++
-    await fs.appendFile(`${roomid}/${filename}`, `${timestamp}:${mid}:${message}\n`)
+    await fs.appendFile(`danmaku/${roomid}/${filename}`, `${timestamp}:${mid}:${message}\n`)
   }
 })
