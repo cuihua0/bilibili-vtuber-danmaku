@@ -48,6 +48,7 @@ const collect = async prefix => {
   console.log(`${prefix} git add ${gitAddCode}`)
 
   const gitCommit = spawn('git', ['commit', '-m', `'del ${prefix}'`])
+  gitCommit.stdout.pipe(process.stdout)
   gitCommit.stderr.pipe(process.stderr)
   const gitCommitCode = await new Promise(resolve => gitCommit.on('exit', resolve))
   console.log(`${prefix} git commit ${gitCommitCode}`)
