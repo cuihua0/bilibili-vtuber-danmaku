@@ -34,7 +34,7 @@ const collect = async prefix => {
   const targets = pairs.filter(([_, file]) => file.startsWith(`${prefix}-`))
   console.log(`${prefix} ${targets.length}`)
   if (!targets.length) {
-    return
+    return { p: Promise.resolve() }
   }
   await mkdir(prefix).catch(mkdirCatch)
   await Promise.all(targets.map(([roomid, file]) => mk(prefix, roomid).then(() => rename(join('danmaku', roomid, file), join(prefix, roomid, file)))))
