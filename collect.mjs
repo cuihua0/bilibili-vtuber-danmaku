@@ -48,12 +48,12 @@ const collect = async prefix => {
   console.log(`${prefix} git add ${gitAddCode}`)
 
   const gitCommit = spawn('git', ['commit', '-m', `'del ${prefix}'`])
-  gitCommit.stdout.pipe(process.stdout)
+  gitCommit.stdout.on('data', () => { })
   gitCommit.stderr.pipe(process.stderr)
   const gitCommitCode = await new Promise(resolve => gitCommit.on('exit', resolve))
   console.log(`${prefix} git commit ${gitCommitCode}`)
 
-  return zp
+  return { p: zp }
 }
 
   ;
@@ -66,7 +66,7 @@ const collect = async prefix => {
   const prefixes = years.flatMap(year => months.map(month => `${year}-${month}`))
   const zps = []
   for (const prefix of prefixes) {
-    zps.push(await collect(prefix))
+    zps.push((await collect(prefix)).p)
   }
 
   await Promise.all(zps)
